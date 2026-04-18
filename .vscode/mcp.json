@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "hack5250": {
+      "command": "python3",
+      "args": ["MCPs/hack5250_mcp/hack5250_mcp.py"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

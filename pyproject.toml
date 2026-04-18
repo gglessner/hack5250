@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hack5250"
+version = "0.1.0"
+description = "tn5250 MITM proxy for IBM i (AS/400) pentesting"
+authors = [{name = "Garland Glessner", email = "gglessner@gmail.com"}]
+requires-python = ">=3.11"
+license = {text = "GPL-3.0"}
+
+[project.urls]
+Homepage = "https://github.com/gglessner/hack5250"
+dependencies = ["hackterm-core>=0.1.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+gui = ["PySide6>=6.5.0"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["hack5250*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
