@@ -69,13 +69,17 @@ def test_unprotect_byte_count_against_real_packet():
     Selective unprotect should change 4 FFW high bytes (one per hidden
     field), NOT 97. Plus 3 SOH mask bytes = 7 total."""
     import sqlite3
-    db = sqlite3.connect("/home/kali/hack3270-update/hack5250/ibmi_pentest.db")
+    from pathlib import Path
+    db_path = Path(__file__).resolve().parent.parent / "ibmi_pentest.db"
+    if not db_path.exists():
+        pytest.skip("ibmi_pentest.db not found")
+    db = sqlite3.connect(str(db_path))
     cur = db.cursor()
     cur.execute("SELECT RAW_DATA FROM Logs WHERE ID=248")
     row = cur.fetchone()
     db.close()
     if row is None:
-        pytest.skip("Mels Cargo capture not in db")
+        pytest.skip("Mels Cargo capture not in db (log ID 248 missing)")
     raw = bytes(row[0])
 
     out = TN5250().mutate(raw, MutateOpts(unprotect=True))

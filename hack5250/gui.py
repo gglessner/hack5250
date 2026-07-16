@@ -801,7 +801,7 @@ class _MainWindow(QMainWindow):
             return
         hexdump = raw.hex(" ", 1)
         try:
-            text = self.h.codec.decode(raw)
+            text = self.h.codec.to_ascii(raw)
         except Exception:
             text = "(decode failed)"
         self._logs_detail.setPlainText(
@@ -869,11 +869,11 @@ class _MainWindow(QMainWindow):
                     # row = (ID, TIMESTAMP, C_S, NOTES, DATA_LEN, RAW_DATA)
                     rid, ts, cs, notes, dlen = row[0], row[1], row[2], row[3], row[4]
                     r = base + off
-                    tbl.setItem(r, 0, QTableWidgetItem(str(rid)))
+                    tbl.setItem(r, 0, _NumericItem(rid))
                     tbl.setItem(r, 1, QTableWidgetItem(_fmt_ts(ts)))
                     tbl.setItem(r, 2, QTableWidgetItem(str(cs)))
                     tbl.setItem(r, 3, QTableWidgetItem(str(notes or "")))
-                    tbl.setItem(r, 4, QTableWidgetItem(str(dlen)))
+                    tbl.setItem(r, 4, _NumericItem(dlen))
                     self._logs_last_id = max(self._logs_last_id, rid)
                 tbl.setSortingEnabled(was_sorting)
 
@@ -886,6 +886,19 @@ class _MainWindow(QMainWindow):
 # ======================================================================
 # Helpers
 # ======================================================================
+
+class _NumericItem(QTableWidgetItem):
+    """QTableWidgetItem that sorts numerically instead of lexicographically."""
+
+    def __init__(self, value: int):
+        super().__init__(str(value))
+        self._value = value
+
+    def __lt__(self, other):
+        if isinstance(other, _NumericItem):
+            return self._value < other._value
+        return super().__lt__(other)
+
 
 def _load_wordlist(filename: str) -> list[str]:
     """Read INJECTIONS_DIR/<filename>, strip blanks and # comments."""

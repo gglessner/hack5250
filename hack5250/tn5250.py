@@ -148,7 +148,17 @@ class TN5250(Protocol):
         while pos < end:
             b = data[pos]
 
-            if b == ESC or b == IAC:
+            if b == ESC:
+                break
+
+            if b == IAC:
+                # Doubled IAC (0xFF 0xFF) = telnet escape for literal 0xFF.
+                # Raw packets in the log DB still contain telnet IAC doubling
+                # per RFC 854. Skip both bytes and continue parsing.
+                if pos + 1 < end and data[pos + 1] == IAC:
+                    pos += 2
+                    continue
+                # Lone IAC (e.g. preceding EOR) = end of record.
                 break
 
             elif b == ORD_SOH:
@@ -206,6 +216,15 @@ class TN5250(Protocol):
                 pos += 1
                 field, pos = self._parse_sf(data, pos, end, cur_row, cur_col)
                 if field is not None:
+                    # Report field at the input position (col after attr byte).
+                    # The attr byte occupies cur_col; the actual input starts
+                    # at cur_col + 1. Without this, subfile selection fields
+                    # report col 1 when actual input requires col 2.
+                    field.col = cur_col + 1
+                    field.row = cur_row
+                    if field.col > screen.cols:
+                        field.col = 1
+                        field.row += 1
                     screen.fields.append(field)
                 # The attr byte itself takes one screen position
                 cur_col += 1
@@ -456,7 +475,14 @@ class TN5250(Protocol):
         while pos < end:
             b = out[pos]
 
-            if b == ESC or b == IAC:
+            if b == ESC:
+                break
+
+            if b == IAC:
+                # Doubled IAC (0xFF 0xFF) = telnet escape for literal 0xFF.
+                if pos + 1 < end and out[pos + 1] == IAC:
+                    pos += 2
+                    continue
                 break
 
             elif b == ORD_SOH:

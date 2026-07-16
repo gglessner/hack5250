@@ -106,7 +106,7 @@ def test_get_fields_after_screen(h, pkt_one_input_field):
     fields = json.loads(call(h, "get_fields"))
     assert len(fields) == 1
     assert fields[0]["row"] == 5
-    assert fields[0]["col"] == 10
+    assert fields[0]["col"] == 11
     assert fields[0]["protected"] is False
 
 
@@ -162,7 +162,7 @@ def test_get_hidden_content_handler(h, pkt_hidden_field):
     h.last_screen = h.protocol.parse(pkt_hidden_field)
     resp = json.loads(call(h, "get_hidden_content"))
     assert len(resp) == 1
-    assert resp[0]["row"] == 3  # pkt_hidden_field is at r3c5
+    assert resp[0]["row"] == 3  # pkt_hidden_field is at r3c5 (field col is 6)
 
 
 def test_tamper_map_handler(h, pkt_signon_screen):

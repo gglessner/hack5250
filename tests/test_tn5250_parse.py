@@ -31,7 +31,7 @@ def test_parse_one_input_field(proto, pkt_one_input_field):
     assert len(s.fields) == 1
     f = s.fields[0]
     assert f.row == 5
-    assert f.col == 10
+    assert f.col == 11
     assert f.length == 8
     assert f.protected is False
     assert f.hidden is False
@@ -65,10 +65,10 @@ def test_parse_signon_screen_three_fields(proto, pkt_signon_screen):
     assert len(s.fields) == 3
     # Label: output-only, no FFW means not an input field but still a Field
     label, user, password = s.fields
-    assert label.row == 1 and label.col == 36
-    assert user.row == 6 and user.col == 17 and user.length == 10
+    assert label.row == 1 and label.col == 37
+    assert user.row == 6 and user.col == 18 and user.length == 10
     assert user.hidden is False
-    assert password.row == 7 and password.col == 17
+    assert password.row == 7 and password.col == 18
     assert password.hidden is True
 
 
